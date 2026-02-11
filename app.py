@@ -10,8 +10,11 @@ import os
 import logging
 from functools import wraps
 from sqlalchemy import func, extract
+from flask_cors import CORS
+
 
 app = Flask(__name__)
+CORS(app, supports_credentials=True)
 
 # Configuration
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL')
