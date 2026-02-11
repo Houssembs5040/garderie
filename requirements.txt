@@ -5,3 +5,4 @@ sqlalchemy
 werkzeug
 psycopg2-binary
 gunicorn
+flask-cors
