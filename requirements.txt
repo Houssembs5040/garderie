@@ -1,0 +1,6 @@
+flask
+flask-sqlalchemy
+flask-jwt-extended
+sqlalchemy
+werkzeug
+psycopg2-binary
