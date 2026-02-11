@@ -152,7 +152,7 @@ def org_scoped(f):
     @jwt_required()
     def decorated(*args, **kwargs):
         current_user = get_jwt_identity()
-        g.org_id = current_user['org_id']
+        g.org_id = int(current_user)
         return f(*args, **kwargs)
     return decorated
 
@@ -164,7 +164,13 @@ def login():
     password = data.get('password')
     org = Organization.query.filter_by(email=email).first()
     if org and check_password_hash(org.password_hash, password):
-        access_token = create_access_token(identity={'org_id': org.id, 'email': org.email})
+        access_token = access_token = create_access_token(
+    identity=str(org.id),  
+    additional_claims={
+        "email": org.email
+    }
+)
+
         return jsonify(access_token=access_token), 200
     return jsonify(message='Invalid credentials'), 401
 
