@@ -416,7 +416,39 @@ def record_attendance():
         db.session.add(att)
     db.session.commit()
     return jsonify(message='Recorded')
+@app.route('/attendance', methods=['GET'])
+@org_scoped
+def get_attendance_by_date():
+    date_str = request.args.get('date')
+    if not date_str:
+        return jsonify(message="Date is required"), 400
 
+    try:
+        date_val = datetime.fromisoformat(date_str).date()
+    except ValueError:
+        return jsonify(message="Invalid date format"), 400
+
+    records = (
+        Attendance.query
+        .filter_by(
+            organization_id=g.org_id,
+            date=date_val
+        )
+        .join(Student, Attendance.student_id == Student.id)
+        .add_columns(Student.firstname, Student.lastname)
+        .all()
+    )
+
+    return jsonify([{
+        "student_id": att.Attendance.student_id,
+        "firstname": att.firstname,
+        "lastname": att.lastname,
+        "date": serialize_date(att.Attendance.date),
+        "status": att.Attendance.status,
+        "arrival_time": serialize_time(att.Attendance.arrival_time),
+        "departure_time": serialize_time(att.Attendance.departure_time),
+        "notes": att.Attendance.notes
+    } for att in records])
 @app.route('/attendance/report', methods=['GET'])
 @org_scoped
 def attendance_report():
